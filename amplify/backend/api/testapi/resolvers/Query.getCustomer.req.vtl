@@ -1,0 +1,11 @@
+{
+  "version": "2018-05-29",
+  "method": "GET",
+  "resourcePath": "/user-management/v1/customers/$ctx.args.id",
+  "params":{
+      "headers": {
+          "X-PLGS-JWT": "$ctx.request.headers.Authorization",
+          "X-PLGS-RequestID": "$util.autoId()",
+      }
+  }
+}

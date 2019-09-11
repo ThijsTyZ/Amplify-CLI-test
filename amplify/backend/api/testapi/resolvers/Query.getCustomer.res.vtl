@@ -1,0 +1,14 @@
+## Raise a GraphQL field error in case of a datasource invocation error
+#if($ctx.error)
+  $util.error($ctx.error.message, $ctx.error.type)
+#end
+## If the response is not 200 then return an error. Else return the body **
+#set($jsonResult = $util.parseJson($ctx.result.body))
+
+#if($jsonResult.status == 200)
+	#if(!$jsonResult.customer.shippingAddresses)
+    	#set($jsonResult.customer.shippingAddresses = [])
+    #end
+
+	$util.toJson($jsonResult.customer)
+#end

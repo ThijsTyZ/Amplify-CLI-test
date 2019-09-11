@@ -27,9 +27,104 @@
 		}
 	},
 	"Resources": {
+		"AppSyncAthenaRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"RoleName": {
+					"Fn::Join": [
+						"-",
+						["appSyncAthenaRole", { "Ref": "AppSyncApiId" }, { "Ref": "env" }]
+					]
+				},
+				"ManagedPolicyArns": [
+					"arn:aws:iam::aws:policy/AmazonAthenaFullAccess",
+					"arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+				],
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": ["appsync.amazonaws.com"]
+							},
+							"Action": ["sts:AssumeRole"]
+						}
+					]
+				}
+			}
+		},
+
 		"EmptyResource": {
 			"Type": "Custom::EmptyResource",
 			"Condition": "AlwaysFalse"
+		},
+		"DataSourceAthenaAPI": {
+			"Type": "AWS::AppSync::DataSource",
+			"Properties": {
+				"ApiId": {
+					"Ref": "AppSyncApiId"
+				},
+				"Name": "API",
+				"Description": "Athena API",
+				"Type": "HTTP",
+				"ServiceRoleArn": { "Fn::GetAtt": ["AppSyncAthenaRole", "Arn"] },
+				"HttpConfig": {
+					"Endpoint": {
+						"Fn::Join": [
+							".",
+							["https://athena", { "Ref": "AWS::Region" }, "amazonaws.com/"]
+						]
+					},
+					"AuthorizationConfig": {
+						"AuthorizationType": "AWS_IAM",
+						"AwsIamConfig": {
+							"SigningRegion": { "Ref": "AWS::Region" },
+							"SigningServiceName": "athena"
+						}
+					}
+				}
+			}
+		},
+		"QueryGetCustomerResolver": {
+			"Type": "AWS::AppSync::Resolver",
+			"Properties": {
+				"ApiId": {
+					"Ref": "AppSyncApiId"
+				},
+				"DataSourceName": { "Fn::GetAtt": ["DataSourceAthenaAPI", "Name"] },
+				"TypeName": "Query",
+				"FieldName": "getCustomer",
+				"RequestMappingTemplateS3Location": {
+					"Fn::Sub": [
+						"s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.getCustomer.req.vtl",
+						{
+							"S3DeploymentBucket": { "Ref": "S3DeploymentBucket" },
+							"S3DeploymentRootKey": { "Ref": "S3DeploymentRootKey" }
+						}
+					]
+				},
+				"ResponseMappingTemplateS3Location": {
+					"Fn::Sub": [
+						"s3://${S3DeploymentBucket}/${S3DeploymentRootKey}/resolvers/Query.getCustomer.res.vtl",
+						{
+							"S3DeploymentBucket": { "Ref": "S3DeploymentBucket" },
+							"S3DeploymentRootKey": { "Ref": "S3DeploymentRootKey" }
+						}
+					]
+				}
+			}
+		},
+		"DataSourceNone": {
+			"Type": "AWS::AppSync::DataSource",
+			"Properties": {
+				"ApiId": {
+					"Ref": "AppSyncApiId"
+				},
+				"Name": "None",
+				"Description": "None",
+				"Type": "NONE"
+			}
 		}
 	},
 	"Conditions": {
