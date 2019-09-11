@@ -1,0 +1,14 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "appsync-cli-sandbox-dev-20190909163310-authRole",
+            "UnauthRoleArn": "arn:aws:iam::421128843647:role/appsync-cli-sandbox-dev-20190909163310-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::421128843647:role/appsync-cli-sandbox-dev-20190909163310-authRole",
+            "Region": "us-east-2",
+            "DeploymentBucketName": "appsync-cli-sandbox-dev-20190909163310-deployment",
+            "UnauthRoleName": "appsync-cli-sandbox-dev-20190909163310-unauthRole",
+            "StackName": "appsync-cli-sandbox-dev-20190909163310",
+            "StackId": "arn:aws:cloudformation:us-east-2:421128843647:stack/appsync-cli-sandbox-dev-20190909163310/a8cfa2c0-d338-11e9-a207-0a2e34a37100"
+        }
+    }
+}
